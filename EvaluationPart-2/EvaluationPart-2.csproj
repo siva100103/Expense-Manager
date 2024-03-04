@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F9A3C3B6-BC12-4DB9-9259-1FD200DEA721}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>EvaluationPart_2</RootNamespace>
+    <AssemblyName>EvaluationPart-2</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AddBudgetForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddBudgetForm.Designer.cs">
+      <DependentUpon>AddBudgetForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddCategoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddCategoryForm.Designer.cs">
+      <DependentUpon>AddCategoryForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddCustomBudget.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddCustomBudget.Designer.cs">
+      <DependentUpon>AddCustomBudget.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AddExpenseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddExpenseForm.Designer.cs">
+      <DependentUpon>AddExpenseForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Calendar.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Calendar.Designer.cs">
+      <DependentUpon>Calendar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CategoryEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CategoryEditForm.Designer.cs">
+      <DependentUpon>CategoryEditForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditForm.Designer.cs">
+      <DependentUpon>EditForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExpenseManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExpenseManager.Designer.cs">
+      <DependentUpon>ExpenseManager.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AddBudgetForm.resx">
+      <DependentUpon>AddBudgetForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddCategoryForm.resx">
+      <DependentUpon>AddCategoryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddCustomBudget.resx">
+      <DependentUpon>AddCustomBudget.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AddExpenseForm.resx">
+      <DependentUpon>AddExpenseForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Calendar.resx">
+      <DependentUpon>Calendar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CategoryEditForm.resx">
+      <DependentUpon>CategoryEditForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditForm.resx">
+      <DependentUpon>EditForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExpenseManager.resx">
+      <DependentUpon>ExpenseManager.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\DataSources\category.datasource" />
+    <None Include="Properties\DataSources\Expense.datasource" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-home-100.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-home-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-expense-48.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-expense-25.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-category-25.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-category-48.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-filter-25.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-remove-25.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-edit-24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-budget-25.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
