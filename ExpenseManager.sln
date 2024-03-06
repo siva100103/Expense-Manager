@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 15 for Windows Desktop
 VisualStudioVersion = 15.0.27703.2047
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvaluationPart-2", "EvaluationPart-2\EvaluationPart-2.csproj", "{F9A3C3B6-BC12-4DB9-9259-1FD200DEA721}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseManager", "EvaluationPart-2\ExpenseManager.csproj", "{F9A3C3B6-BC12-4DB9-9259-1FD200DEA721}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
