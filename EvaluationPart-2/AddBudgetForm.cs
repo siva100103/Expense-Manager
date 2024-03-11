@@ -28,10 +28,18 @@ namespace EvaluationPart_2
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string s = comboBox1.SelectedItem.ToString();
-            int n = (int)numericUpDown1.Value;
-            di.Add(s, n);
-            this.Close();
+            try
+            {
+                string s = comboBox1.SelectedItem.ToString();
+                int n = (int)numericUpDown1.Value;
+                di.Add(s, n);
+                this.Close();
+            }
+            catch
+            {
+                MessageBox.Show("Enter the Category");
+            }
+            
         }
     }
 }

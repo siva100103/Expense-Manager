@@ -3,25 +3,29 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-
+using MySql.Data.MySqlClient;
 namespace EvaluationPart_2
 {
     public partial class ExpenseManager : Form
     {
         List<Expense> expenses = new List<Expense>();
         List<Category> categories = new List<Category>();
+        string con;
+        MySqlConnection Connection;
 
         Dictionary<string, int> MainBudgetControl = new Dictionary<string, int>();
         Dictionary<string, int> SpendedBudget = new Dictionary<string, int>();
-        private DateTime MaxDate;
-        private DateTime MinDate;
+        private DateTime MaxDate=DateTime.Now;
+        private DateTime MinDate=DateTime.Now;
 
         public ExpenseManager()
         {
             InitializeComponent();
             dataGridView1.ReadOnly = dataGridView2.ReadOnly = dataGridView3.ReadOnly = dataGridView4.ReadOnly = true;
-
-           // For Expense Page
+            con = "server=localhost;port=3306;uid=root;pwd=Suriya@123;database=expensedatabase";
+            Connection = new MySqlConnection(con);
+            Connection.Open();
+            // For Expense Page
             Edt.Columns.Add("Id", typeof(int));
             Edt.Columns.Add("Category", typeof(string));
             Edt.Columns.Add("Amount", typeof(int));
@@ -29,16 +33,8 @@ namespace EvaluationPart_2
             Edt.Columns.Add("Notes", typeof(string));
             Edt.Columns.Add(" ", typeof(Image));
             Edt.Columns.Add("  ", typeof(Image));
-
-            categories.AddRange(new Category[] {
-            new Category { Id = 1, Name = "Food" },
-            new Category { Id = 2, Name = "Travel" },
-            new Category { Id = 3, Name = "Others" }
-            });
-
             dataGridView1.DataSource = Edt;
-            dataGridView1.Columns[0].Visible = dataGridView1.Columns[5].Visible = dataGridView1.Columns[6].Visible = false;
-            button3.Visible =button4.Visible= false;
+            dataGridView1.Columns[0].Visible  = false;
             ExpensePanel.BackColor = Color.AliceBlue;
 
 
@@ -48,8 +44,6 @@ namespace EvaluationPart_2
             Cdt.Columns.Add(" ", typeof(Image));
             Cdt.Columns.Add("  ", typeof(Image));
             dataGridView2.DataSource = Cdt;
-            categories.ForEach( c => Cdt.Rows.Add(c.Id, c.Name, Properties.Resources.icons8_edit_24, Properties.Resources.icons8_remove_25));
-            dataGridView2.Columns[2].Visible = dataGridView2.Columns[3].Visible = false;
 
 
             //For SortPage            
@@ -73,12 +67,105 @@ namespace EvaluationPart_2
             Bdt.Columns.Add(" ", typeof(Image));
             Bdt.Columns.Add("  ", typeof(Image));
             dataGridView4.DataSource = Bdt;
-            dataGridView4.Columns[2].Visible = dataGridView4.Columns[3].Visible = false;
+            dataGridView4.ReadOnly = false;
+            dataGridView4.Columns[2].Visible = false;
+            dataGridView4.Columns[0].ReadOnly = true;
 
             ExpenseTableUpdate();
             FilterTableUpdate();
             CategoryTableUpdate();
             BudgetTableUpdate();
+        }
+
+        // For Db Operations
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            MySqlDataReader reader = new MySqlCommand("Select * From Expenses",Connection).ExecuteReader();
+            while (reader.Read())
+            {
+                Expense ex = new Expense
+                {
+                    Id = Convert.ToInt32(reader["Id"]),
+                    Amount = Convert.ToInt32(reader["Amount"]),
+                    Category = reader["Category"].ToString(),
+                    Date = (DateTime)reader["Date"],
+                    Notes = reader["Notes"].ToString()
+                };
+                expenses.Add(ex);
+            }
+            reader.Close();
+           
+            reader = new MySqlCommand("Select * From Categories",Connection).ExecuteReader();
+            while (reader.Read())
+            {
+                Category c = new Category
+                {
+                    Id = Convert.ToInt32(reader["Id"]),
+                    Name = reader["Name"].ToString()
+                };
+                comboBox1.Items.Add(c.Name);
+                categories.Add(c);
+            }
+            reader.Close();
+
+            reader = new MySqlCommand("Select * From MainBudgetControl",Connection).ExecuteReader();
+            while (reader.Read())
+            {
+                MainBudgetControl.Add(reader["Period"].ToString(), Convert.ToInt32(reader["Budget"]));
+            }
+            reader.Close();
+            expenses.ForEach((ex) =>
+            {
+                string s =$"{ex.Category},{ex.Date.Month.ToString()},{ex.Date.Year.ToString()}";
+                if (SpendedBudget.ContainsKey(s)) SpendedBudget[s] += ex.Amount;
+                else SpendedBudget.Add(s, ex.Amount);
+            });
+            ExpenseCount = expenses.Count+1;
+           if (categories.Count != 0) CategoryCount = categories[categories.Count - 1].Id + 1;
+            ExpenseTableUpdate();
+            CategoryTableUpdate();
+            BudgetTableUpdate();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            MySqlCommand command = new MySqlCommand("Delete from Expenses",Connection);
+            command.ExecuteNonQuery();
+            int count = 1;
+            expenses.Sort((ex, ex1) => ex.Amount.CompareTo(ex1.Amount));
+            categories.Sort((c, c1) => c.Id.CompareTo(c1.Id));
+            expenses.ForEach((ex) =>
+            {
+                ex.Id = count++;
+                command = new MySqlCommand("Insert into Expenses values(@Id,@Category,@Date,@Amount,@Notes)",Connection);
+                command.Parameters.AddWithValue("@Id", ex.Id);
+                command.Parameters.AddWithValue("@Category", ex.Category);
+                command.Parameters.AddWithValue("@Date", ex.Date);
+                command.Parameters.AddWithValue("@Amount", ex.Amount);
+                command.Parameters.AddWithValue("@Notes", ex.Notes);
+                command.ExecuteNonQuery();
+            });
+            command = new MySqlCommand("Delete From Categories", Connection);
+            command.ExecuteNonQuery();
+            categories.ForEach((c) =>
+            {
+                command = new MySqlCommand("Insert into Categories Values(@Id,@Name)", Connection);
+                command.Parameters.AddWithValue("@Id", c.Id);
+                command.Parameters.AddWithValue("@Name", c.Name);
+                command.ExecuteNonQuery();
+            });
+            command = new MySqlCommand("Delete From MainBudgetControl",Connection);
+            command.ExecuteNonQuery();
+            foreach(var a in MainBudgetControl)
+            {
+                command =new MySqlCommand("Insert into MainBudgetControl Values(@Period,@Budget)",Connection);
+                command.Parameters.AddWithValue("@Period",a.Key);
+                command.Parameters.AddWithValue("@Budget",a.Value);
+                command.ExecuteNonQuery();
+            }
         }
 
         //For Tab Switching
@@ -159,9 +246,6 @@ namespace EvaluationPart_2
                 tabControl1.SelectedTab = BudgetPage;
                 SelectedTab = 4;
             }
-
-            dataGridView1.Columns[5].Visible = dataGridView1.Columns[6].Visible  = false;
-            dataGridView2.Columns[2].Visible = dataGridView2.Columns[3].Visible = false;
         }
 
 
@@ -178,8 +262,6 @@ namespace EvaluationPart_2
 
         private void E_AddButtonClick(object sender, EventArgs e)
         {
-            dataGridView1.Columns[5].Visible = false;
-            dataGridView1.Columns[6].Visible = false;
             AddExpenseForm fm = new AddExpenseForm(categories);
             fm.GetData += (c, amount, date, note) =>
             {
@@ -202,8 +284,6 @@ namespace EvaluationPart_2
                     dateTimePicker1.Value = MinDate;
                 }
                 expenses.Add(ex);
-                button3.Visible = true;
-                button4.Visible = true;
                 fm.Close();
                 BudgetUpdaterAndChecker(amount,c.Name,date);
                 
@@ -212,18 +292,6 @@ namespace EvaluationPart_2
             };
            
             fm.Show();
-        }
-
-        private void E_EditButtonClick(object sender, EventArgs e)
-        {
-            dataGridView1.Columns[5].Visible = false;
-            dataGridView1.Columns[6].Visible = true;
-        }
-
-        private void E_RemoveButtonClick(object sender, EventArgs e)
-        {
-            dataGridView1.Columns[5].Visible = true;
-            dataGridView1.Columns[6].Visible = false;
         }
 
         private void ExpenseDeleterAndUpdater(object sender, DataGridViewCellEventArgs e)
@@ -242,10 +310,6 @@ namespace EvaluationPart_2
                     FilterTableUpdate();
                     MessageBox.Show("Expense Updated");
                 };
-                ed.FormClosed += (sen, ev) =>
-                {
-                    dataGridView1.Columns[6].Visible = false;
-                };
                 expenses.Add(expense);
             }
             else if (e.ColumnIndex == 5 && e.RowIndex != -1)
@@ -260,20 +324,12 @@ namespace EvaluationPart_2
                         {
                             string s = a.Category + "," + a.Date.Month + "," + a.Date.Year;
                             SpendedBudget[s] -= a.Amount;
-                            expenses.Remove(a);
-                            
+                            expenses.Remove(a);     
                         }
-                    }
-                   
-                    if (expenses.Count == 0)
-                    {
-                        button3.Visible = false;
-                        button4.Visible = false;
-                    }
+                    }    
                     ExpenseTableUpdate();
                     FilterTableUpdate();
                 }
-                dataGridView1.Columns[5].Visible = false;
             }
             
         }
@@ -281,11 +337,7 @@ namespace EvaluationPart_2
         private void ExpenseTableUpdate()
         {
             Edt.Rows.Clear();
-
             foreach (var a in expenses) Edt.Rows.Add(a.Id, a.Category, a.Amount, a.Date.ToShortDateString() + " " + a.Date.ToShortTimeString(), a.Notes, Properties.Resources.icons8_remove_25, Properties.Resources.icons8_edit_24);
-
-            dataGridView1.Columns[5].Visible = false;
-            dataGridView1.Columns[6].Visible = false;
         }
 
         private void BudgetUpdaterAndChecker(int amount,string category,DateTime date)
@@ -315,8 +367,6 @@ namespace EvaluationPart_2
         private void AddCategoryButtonClick(object sender, EventArgs e)
         {
             AddCategoryForm ac = new AddCategoryForm(categories, CategoryCount);
-            dataGridView2.Columns[2].Visible = false;
-            dataGridView2.Columns[3].Visible = false;
             ac.AddFinished += (ob, s) =>
             {
                 ac.Close();
@@ -332,18 +382,6 @@ namespace EvaluationPart_2
             ac.Show();
         }
 
-        private void EditCategoryButtonClick(object sender, EventArgs e)
-        {
-            dataGridView2.Columns[2].Visible = true;
-            dataGridView2.Columns[3].Visible = false;
-        }
-
-        private void DeleteCategoryButtonClick(object sender, EventArgs e)
-        {
-            dataGridView2.Columns[2].Visible = false;
-            dataGridView2.Columns[3].Visible = true;
-        }
-
         private void CategoryDeleterAndUpdater(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex != -1 && e.ColumnIndex == 2)
@@ -351,7 +389,6 @@ namespace EvaluationPart_2
                 string OldCategoryName = dataGridView2.Rows[e.RowIndex].Cells[1].Value.ToString();
                 CategoryEditForm ce = new CategoryEditForm(categories, OldCategoryName, expenses,SpendedBudget);
                 ce.Show();
-                ce.FormClosed += (se, ev) => dataGridView2.Columns[2].Visible = false;
                 ce.CategoryUpdated += (ob, NewCategoryName) =>
                 {
                     ExpenseTableUpdate();
@@ -392,7 +429,6 @@ namespace EvaluationPart_2
                         {
                             if (a.Category.Equals(CategoryName)) expenses.Remove(a);
                         }
-                        dataGridView2.Columns[3].Visible = false;
                     }
                     else
                     {
@@ -407,12 +443,6 @@ namespace EvaluationPart_2
                                 SpendedBudget.Remove(CategoryName + "," + a.Date.Month + "," + a.Date.Year);
                             }
                         }
-                    }
-                    
-                    if (categories.Count == 1)
-                    {
-                        DeleteCategoryButton.Visible = false;
-                        EditCategoryButton.Visible = false;
                     }
                     MainBudgetControl.Remove(CategoryName);
                 }
@@ -463,10 +493,9 @@ namespace EvaluationPart_2
 
         //For Budget Page
         DataTable Bdt = new DataTable();
+
         private void AddBudgetButton_Click(object sender, EventArgs e)
         {
-            dataGridView4.Columns[2].Visible = false;
-            dataGridView4.Columns[3].Visible = false;
             AddBudgetForm fm = new AddBudgetForm(categories,MainBudgetControl);
             fm.Show();
             fm.FormClosed += (se, ev) =>
@@ -476,33 +505,13 @@ namespace EvaluationPart_2
                 {
                     AddBudgetButton.Visible = false;
                 }
-                DeleteBudgetButton.Visible = true;
-                EditBudgetButton.Visible = true;
             };
-        }
-
-        private void EditBudgetButton_Click(object sender, EventArgs e)
-        {
-            dataGridView4.Columns[2].Visible = true;
-            dataGridView4.Columns[3].Visible = false;
-            dataGridView4.ReadOnly = false;
-            dataGridView4.Columns[0].ReadOnly = true;
-        }
-
-        private void DeleteBudgetButton_Click(object sender, EventArgs e)
-        {
-            dataGridView4.Columns[2].Visible = false;
-            dataGridView4.Columns[3].Visible = true;
-            AddBudgetButton.Visible = true;     
         }
 
         private void dataGridView4_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if(e.RowIndex!=-1 && e.ColumnIndex == 2)
-            {
-                dataGridView4.Columns[2].Visible = false;
-            }
-            else if(e.RowIndex!=-1 && e.ColumnIndex == 3)
+
+            if(e.RowIndex!=-1 && e.ColumnIndex == 3)
             {
                 DialogResult res = MessageBox.Show("Do You Want to remove the Budget", "Confirmation", MessageBoxButtons.YesNo);
                 if (res == DialogResult.Yes)
@@ -511,12 +520,7 @@ namespace EvaluationPart_2
                     string s = cell.Value.ToString();
                     MainBudgetControl.Remove(s);
                     BudgetTableUpdate();
-                    if (MainBudgetControl.Count == 0)
-                    {
-                        DeleteBudgetButton.Visible = EditBudgetButton.Visible = false;
-                    }
                 }
-                dataGridView4.Columns[3].Visible = false;
             }
         }
 
@@ -525,7 +529,7 @@ namespace EvaluationPart_2
             Bdt.Rows.Clear();
             foreach (var a in MainBudgetControl)
             {
-                if (a.Key.Split(',').Length != 1) continue;
+               
                 Bdt.Rows.Add(a.Key, a.Value, Properties.Resources.icons8_edit_24, Properties.Resources.icons8_remove_25);
             }  
         }
@@ -544,6 +548,7 @@ namespace EvaluationPart_2
         {
             AddCustomBudget cb = new AddCustomBudget(categories,MainBudgetControl);
             cb.Show();
+            cb.FormClosed += (ob, cv) => BudgetTableUpdate();
         }
     }
 
