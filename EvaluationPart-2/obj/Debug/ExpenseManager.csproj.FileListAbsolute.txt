@@ -29,3 +29,5 @@ D:\practice\Expense-Manager\EvaluationPart-2\obj\Debug\ExpenseManager.csproj.Gen
 D:\practice\Expense-Manager\EvaluationPart-2\obj\Debug\ExpenseManager.csproj.CoreCompileInputs.cache
 D:\practice\Expense-Manager\EvaluationPart-2\obj\Debug\EvaluationPart-2.exe
 D:\practice\Expense-Manager\EvaluationPart-2\obj\Debug\EvaluationPart-2.pdb
+D:\Sivasurya 23\Expense-Manager\EvaluationPart-2\bin\Debug\MySql.Data.dll
+D:\Sivasurya 23\Expense-Manager\EvaluationPart-2\obj\Debug\ExpenseManager.csproj.CopyComplete
