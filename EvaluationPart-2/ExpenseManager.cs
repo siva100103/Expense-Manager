@@ -25,6 +25,7 @@ namespace EvaluationPart_2
             con = "server=localhost;port=3306;uid=root;pwd=Suriya@123;database=expensedatabase";
             Connection = new MySqlConnection(con);
             Connection.Open();
+
             // For Expense Page
             Edt.Columns.Add("Id", typeof(int));
             Edt.Columns.Add("Category", typeof(string));
@@ -32,7 +33,7 @@ namespace EvaluationPart_2
             Edt.Columns.Add("Date", typeof(string));
             Edt.Columns.Add("Notes", typeof(string));
             Edt.Columns.Add(" ", typeof(Image));
-            Edt.Columns.Add("  ", typeof(Image));
+             Edt.Columns.Add("  ", typeof(Image));
             dataGridView1.DataSource = Edt;
             dataGridView1.Columns[0].Visible  = false;
             ExpensePanel.BackColor = Color.AliceBlue;
@@ -40,11 +41,13 @@ namespace EvaluationPart_2
 
             //For CategoryPage
             Cdt.Columns.Add("Id", typeof(int));
-            Cdt.Columns.Add("Name", typeof(string));
+            Cdt.Columns.Add("Category", typeof(string));
+            Cdt.Columns.Add("Total", typeof(int));
+            Cdt.Columns.Add("Count", typeof(int));
             Cdt.Columns.Add(" ", typeof(Image));
             Cdt.Columns.Add("  ", typeof(Image));
             dataGridView2.DataSource = Cdt;
-
+            dataGridView2.Columns[0].Visible = false;
 
             //For SortPage            
             Sdt.Columns.Add("Id", typeof(int));
@@ -93,6 +96,10 @@ namespace EvaluationPart_2
                     Date = (DateTime)reader["Date"],
                     Notes = reader["Notes"].ToString()
                 };
+                MaxDate = (ex.Date > MaxDate) ? ex.Date : MaxDate;
+                MinDate = (ex.Date < MinDate) ? ex.Date:MinDate;
+                dateTimePicker1.Value = MinDate;
+                dateTimePicker2.Value = MaxDate;
                 expenses.Add(ex);
             }
             reader.Close();
@@ -126,6 +133,7 @@ namespace EvaluationPart_2
            if (categories.Count != 0) CategoryCount = categories[categories.Count - 1].Id + 1;
             ExpenseTableUpdate();
             CategoryTableUpdate();
+            FilterTableUpdate();
             BudgetTableUpdate();
         }
 
@@ -228,8 +236,9 @@ namespace EvaluationPart_2
             {
                 CategoriesPanel.BackColor = Color.AliceBlue;
                 ExpensePanel.BackColor = BudgetPanel.BackColor = SortPanel.BackColor = Color.FromArgb(192, 255, 255);
-                SelectedTab = 2;
                 tabControl1.SelectedTab = CategoriesPage;
+                SelectedTab = 2;
+                
 
             }
             else if(l.Parent.Name.Equals("SortPanel"))
@@ -246,6 +255,7 @@ namespace EvaluationPart_2
                 tabControl1.SelectedTab = BudgetPage;
                 SelectedTab = 4;
             }
+           dataGridView3.Columns["Id"].Visible= dataGridView1.Columns["Id"].Visible = dataGridView2.Columns["Id"].Visible = false;
         }
 
 
@@ -289,8 +299,8 @@ namespace EvaluationPart_2
                 
                 Edt.Rows.Add(ExpenseCount++, c.Name, amount, date.ToShortDateString() + " " + date.ToShortTimeString(), note, Properties.Resources.icons8_remove_25, Properties.Resources.icons8_edit_24);
                 Sdt.Rows.Add(ExpenseCount - 1, c.Name, amount, date.ToShortDateString() + " " + date.ToShortTimeString(), note);
+                CategoryTableUpdate();
             };
-           
             fm.Show();
         }
 
@@ -308,6 +318,7 @@ namespace EvaluationPart_2
                     ed.Close();
                     ExpenseTableUpdate();
                     FilterTableUpdate();
+                    CategoryTableUpdate();
                     MessageBox.Show("Expense Updated");
                 };
                 expenses.Add(expense);
@@ -328,6 +339,7 @@ namespace EvaluationPart_2
                         }
                     }    
                     ExpenseTableUpdate();
+                    CategoryTableUpdate();
                     FilterTableUpdate();
                 }
             }
@@ -336,6 +348,7 @@ namespace EvaluationPart_2
 
         private void ExpenseTableUpdate()
         {
+            
             Edt.Rows.Clear();
             foreach (var a in expenses) Edt.Rows.Add(a.Id, a.Category, a.Amount, a.Date.ToShortDateString() + " " + a.Date.ToShortTimeString(), a.Notes, Properties.Resources.icons8_remove_25, Properties.Resources.icons8_edit_24);
         }
@@ -370,7 +383,7 @@ namespace EvaluationPart_2
             ac.AddFinished += (ob, s) =>
             {
                 ac.Close();
-                Cdt.Rows.Add(CategoryCount++, s, Properties.Resources.icons8_edit_24, Properties.Resources.icons8_remove_25);
+                
                 Category ct = categories.Find(c => c.Id == 3);
                 categories.Remove(ct);
                 categories.Sort((cat, cat1) => cat.Name.CompareTo(cat1.Name));
@@ -384,7 +397,7 @@ namespace EvaluationPart_2
 
         private void CategoryDeleterAndUpdater(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex != -1 && e.ColumnIndex == 2)
+            if (e.RowIndex != -1 && e.ColumnIndex == 4)
             {
                 string OldCategoryName = dataGridView2.Rows[e.RowIndex].Cells[1].Value.ToString();
                 CategoryEditForm ce = new CategoryEditForm(categories, OldCategoryName, expenses,SpendedBudget);
@@ -404,9 +417,10 @@ namespace EvaluationPart_2
                         MainBudgetControl.Remove(OldCategoryName);
                     }
                     BudgetTableUpdate();
+                    CategoryTableUpdate();
                 };
             }
-            else if (e.RowIndex != -1 && e.ColumnIndex == 3)
+            else if (e.RowIndex != -1 && e.ColumnIndex == 5)
             {
                 string CategoryName = dataGridView2.Rows[e.RowIndex].Cells[1].Value.ToString();
                 if (CategoryName.Equals("Others"))
@@ -458,7 +472,16 @@ namespace EvaluationPart_2
             Cdt.Rows.Clear();
             foreach (var a in categories)
             {
-                Cdt.Rows.Add(a.Id, a.Name, Properties.Resources.icons8_edit_24, Properties.Resources.icons8_remove_25);
+                int count=0 ,Total = 0;
+                expenses.ForEach((ex) =>
+                {
+                    if (ex.Category.Equals(a.Name))
+                    {
+                        count++;
+                        Total += ex.Amount;
+                    }
+                });
+                Cdt.Rows.Add(a.Id, a.Name, Total,count,Properties.Resources.icons8_edit_24, Properties.Resources.icons8_remove_25);
             }
         }
 
@@ -550,22 +573,6 @@ namespace EvaluationPart_2
             cb.Show();
             cb.FormClosed += (ob, cv) => BudgetTableUpdate();
         }
-    }
-
-
-    public class Expense
-    {
-        public int Id { get; set; }
-        public string Category { get; set; }
-        public int Amount { get; set; }
-        public DateTime Date { get; set; }
-        public string Notes { get; set; } = "";
-    }
-    
-    public class Category
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
     }
 
 }

@@ -78,6 +78,7 @@
     <Compile Include="Calendar.Designer.cs">
       <DependentUpon>Calendar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Category.cs" />
     <Compile Include="CategoryEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -90,6 +91,7 @@
     <Compile Include="EditForm.Designer.cs">
       <DependentUpon>EditForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Expense.cs" />
     <Compile Include="ExpenseManager.cs">
       <SubType>Form</SubType>
     </Compile>

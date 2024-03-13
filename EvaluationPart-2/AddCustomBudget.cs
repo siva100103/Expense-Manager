@@ -31,10 +31,17 @@ namespace EvaluationPart_2
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int n = Array.IndexOf(arr, arr[comboBox2.SelectedIndex]) + 1;
-            string s = ((Category)comboBox1.SelectedItem).Name+","+n.ToString()+","+numericUpDown2.Value;
-            MainBudgetControl[s] = (int)numericUpDown1.Value;
-            Close();
+            try
+            {
+                int n = Array.IndexOf(arr, arr[comboBox2.SelectedIndex]) + 1;
+                string s = ((Category)comboBox1.SelectedItem).Name + "," + n.ToString() + "," + numericUpDown2.Value;
+                MainBudgetControl[s] = (int)numericUpDown1.Value;
+                Close();
+            }
+            catch
+            {
+                MessageBox.Show("Please Fill All the fields");
+            }
 
         }
     }

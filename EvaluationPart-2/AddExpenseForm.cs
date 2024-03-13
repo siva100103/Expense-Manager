@@ -20,21 +20,12 @@ namespace EvaluationPart_2
             InitializeComponent();
             comboBox1.DataSource = categories;
             comboBox1.DisplayMember = "Name";
+            StartPosition = FormStartPosition.CenterScreen;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             GetData?.Invoke((Category)comboBox1.SelectedItem, (int)numericUpDown1.Value,dateTimePicker1.Value, richTextBox1.Text);
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }

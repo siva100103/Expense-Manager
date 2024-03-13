@@ -24,7 +24,7 @@ namespace EvaluationPart_2
 
         private void AddButtonClick(object sender,EventArgs e)
         {
-            string s = richTextBox2.Text.Trim(); ;
+            string s = richTextBox2.Text.Trim();
             if (s.Equals(""))
             {
                 MessageBox.Show("Enter a Valid Category:");

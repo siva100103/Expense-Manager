@@ -161,7 +161,6 @@
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(158, 24);
             this.comboBox1.TabIndex = 1;
-            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // categoryBindingSource
             // 
@@ -175,7 +174,6 @@
             this.label1.Size = new System.Drawing.Size(86, 29);
             this.label1.TabIndex = 0;
             this.label1.Text = "Category:";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // AddExpenseForm
             // 
